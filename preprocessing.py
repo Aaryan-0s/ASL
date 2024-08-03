@@ -6,10 +6,7 @@ from image_processing import func
 
 if not os.path.exists("data2"):
     os.makedirs("data2")
-if not os.path.exists("data2/train"):
-    os.makedirs("dataluv/train")
-if not os.path.exists("data2/test"):
-    os.makedirs("data2/test")
+
 path = "data/train"
 path1 = "data2"
 a = ["label"]
