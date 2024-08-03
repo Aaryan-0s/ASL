@@ -38,7 +38,7 @@ while True:
 
     # Getting count of existing images
     count = {
-       
+        "zero": len(os.listdir(directory + "/0")),
         "a": len(os.listdir(directory + "/A")),
         "b": len(os.listdir(directory + "/B")),
         "c": len(os.listdir(directory + "/C")),
@@ -66,6 +66,16 @@ while True:
         "y": len(os.listdir(directory + "/Y")),
         "z": len(os.listdir(directory + "/Z")),
     }
+    
+    cv2.putText(
+        frame,
+        "ZERO : " + str(count["zero"]),
+        (10, 70),
+        cv2.FONT_HERSHEY_PLAIN,
+        1,
+        (0, 255, 255),
+        1,
+    )
 
     cv2.putText(
         frame,
@@ -329,10 +339,10 @@ while True:
         break
     if interrupt & 0xFF == ord("0"):
         cv2.imwrite(directory + "0/" + str(count["zero"]) + ".jpg", roi)
-    if interrupt & 0xFF == ord("1"):
-        cv2.imwrite(directory + "1/" + str(count["one"]) + ".jpg", roi)
-    if interrupt & 0xFF == ord("2"):
-        cv2.imwrite(directory + "2/" + str(count["two"]) + ".jpg", roi)
+    # if interrupt & 0xFF == ord("1"):
+    #     cv2.imwrite(directory + "1/" + str(count["one"]) + ".jpg", roi)
+    # if interrupt & 0xFF == ord("2"):
+    #     cv2.imwrite(directory + "2/" + str(count["two"]) + ".jpg", roi)
     # if interrupt & 0xFF == ord('3'):
     #     cv2.imwrite(directory+'3/'+str(count['three'])+'.jpg', roi)
     # if interrupt & 0xFF == ord('4'):
