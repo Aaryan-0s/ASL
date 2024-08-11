@@ -66,7 +66,7 @@ while True:
         "y": len(os.listdir(directory + "/Y")),
         "z": len(os.listdir(directory + "/Z")),
     }
-    
+
     cv2.putText(
         frame,
         "ZERO : " + str(count["zero"]),
@@ -333,7 +333,6 @@ while True:
     test_image = cv2.resize(test_image, (300, 300))
     cv2.imshow("test", test_image)
 
-   
     interrupt = cv2.waitKey(10)
     if interrupt & 0xFF == 27:  # esc key
         break

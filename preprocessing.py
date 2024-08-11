@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import os
-import csv
 from image_processing import func
 
 if not os.path.exists("data2"):
@@ -13,10 +12,6 @@ a = ["label"]
 
 for i in range(64 * 64):
     a.append("pixel" + str(i))
-
-
-# outputLine = a.tolist()
-
 
 label = 0
 var = 0
@@ -31,14 +26,13 @@ for dirpath, dirnames, filenames in os.walk(path):
                 os.makedirs(path1 + "/train/" + dirname)
             if not os.path.exists(path1 + "/test/" + dirname):
                 os.makedirs(path1 + "/test/" + dirname)
-            # num=0.75*len(files)
-            num = 100000000000000000
+            num = int(0.75 * len(files))  # Number of files for training
             i = 0
             for file in files:
                 var += 1
-                actual_path = path + "/" + dirname + "/" + file
-                actual_path1 = path1 + "/" + "train/" + dirname + "/" + file
-                actual_path2 = path1 + "/" + "test/" + dirname + "/" + file
+                actual_path = os.path.join(path, dirname, file)
+                actual_path1 = os.path.join(path1, "train", dirname, file)
+                actual_path2 = os.path.join(path1, "test", dirname, file)
                 img = cv2.imread(actual_path, 0)
                 bw_image = func(actual_path)
                 if i < num:
@@ -48,9 +42,10 @@ for dirpath, dirnames, filenames in os.walk(path):
                     c2 += 1
                     cv2.imwrite(actual_path2, bw_image)
 
-                i = i + 1
+                i += 1
 
-        label = label + 1
-print(var)
-print(c1)
-print(c2)
+        label += 1
+
+print("Total images processed:", var)
+print("Total training images:", c1)
+print("Total testing images:", c2)
