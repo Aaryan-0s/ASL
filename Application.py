@@ -198,89 +198,64 @@ class Application:
 
         self.root.after(5, self.video_loop)
 
-    def predict(self,test_image):
+    def predict(self, test_image):
         test_image = cv2.resize(test_image, (128,128))
         result = self.loaded_model.predict(test_image.reshape(1, 128, 128, 1))
         result_dru = self.loaded_model_dru.predict(test_image.reshape(1 , 128 , 128 , 1))
         result_tkdi = self.loaded_model_tkdi.predict(test_image.reshape(1 , 128 , 128 , 1))
         result_smn = self.loaded_model_smn.predict(test_image.reshape(1 , 128 , 128 , 1))
-        prediction={}
+        prediction = {}
         prediction['blank'] = result[0][0]
         inde = 1
         for i in ascii_uppercase:
             prediction[i] = result[0][inde]
             inde += 1
-        #LAYER 1
+
+        # LAYER 1
         prediction = sorted(prediction.items(), key=operator.itemgetter(1), reverse=True)
         self.current_symbol = prediction[0][0]
-        #LAYER 2
-        if(self.current_symbol == 'D' or self.current_symbol == 'R' or self.current_symbol == 'U'):
-            prediction = {}
-            prediction['D'] = result_dru[0][0]
-            prediction['R'] = result_dru[0][1]
-            prediction['U'] = result_dru[0][2]
+
+        # LAYER 2
+        if self.current_symbol in ['D', 'R', 'U']:
+            prediction = {
+                'D': result_dru[0][0],
+                'R': result_dru[0][1],
+                'U': result_dru[0][2]
+            }
             prediction = sorted(prediction.items(), key=operator.itemgetter(1), reverse=True)
             self.current_symbol = prediction[0][0]
 
-        if(self.current_symbol == 'D' or self.current_symbol == 'I' or self.current_symbol == 'K' or self.current_symbol == 'T'):
-            prediction = {}
-            prediction['D'] = result_tkdi[0][0]
-            prediction['I'] = result_tkdi[0][1]
-            prediction['K'] = result_tkdi[0][2]
-            prediction['T'] = result_tkdi[0][3]
+        if self.current_symbol in ['D', 'I', 'K', 'T']:
+            prediction = {
+                'D': result_tkdi[0][0],
+                'I': result_tkdi[0][1],
+                'K': result_tkdi[0][2],
+                'T': result_tkdi[0][3]
+            }
             prediction = sorted(prediction.items(), key=operator.itemgetter(1), reverse=True)
             self.current_symbol = prediction[0][0]
 
         if self.current_symbol in ['M', 'N', 'S']:
-            prediction1 = {}
-
-            prediction1['M'] = result_smn[0][0]
-            prediction1['N'] = result_smn[0][1]
-            prediction1['S'] = result_smn[0][2]
-
+            prediction1 = {
+                'M': result_smn[0][0],
+                'N': result_smn[0][1],
+                'S': result_smn[0][2]
+            }
             prediction1 = sorted(prediction1.items(), key=operator.itemgetter(1), reverse=True)
 
             if prediction1[0][0] == 'S':
                 self.current_symbol = prediction1[0][0]
             else:
                 self.current_symbol = prediction[0][0]
-        if(self.current_symbol == 'blank'):
+
+        if self.current_symbol == 'blank':
             for i in ascii_uppercase:
                 self.ct[i] = 0
-        self.ct[self.current_symbol] += 1
-        
-        current_time = time.time()
-        if self.current_symbol == self.last_symbol_time:
-            if (current_time - self.last_symbol_time) > self.selection_time_threshold:
-                self.confirmed_symbol_time = current_time
-                if self.current_symbol == 'blank':
-                    if self.blank_flag == 0:
-                        self.blank_flag = 1
-                        if len(self.str) > 0:
-                            self.str += " "
-                        self.str += self.word
-                        self.word = ""
-                else:
-                    if len(self.str) > 16:
-                        self.str = ""
-                    self.blank_flag = 0
-                    self.word += self.current_symbol
-                # Reset the timer
-                self.last_symbol_time = current_time
         else:
-            self.last_symbol_time = current_time
-        if(self.ct[self.current_symbol] > 60):
-            for i in ascii_uppercase:
-                if i == self.current_symbol:
-                    continue
-                tmp = self.ct[self.current_symbol] - self.ct[i]
-                if tmp < 0:
-                    tmp *= -1
-                if tmp <= 20:
-                    self.ct['blank'] = 0
-                    for i in ascii_uppercase:
-                        self.ct[i] = 0
-                    return
+            self.ct[self.current_symbol] += 1
+
+        # Check if the current symbol has been detected for more than 30 frames
+        if self.ct[self.current_symbol] > 30:
             self.ct['blank'] = 0
             for i in ascii_uppercase:
                 self.ct[i] = 0
@@ -292,10 +267,11 @@ class Application:
                     self.str += self.word
                     self.word = ""
             else:
-                if(len(self.str) > 16):
+                if len(self.str) > 16:
                     self.str = ""
                 self.blank_flag = 0
                 self.word += self.current_symbol
+
 
     def action1(self):
 
