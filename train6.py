@@ -1,8 +1,17 @@
 # Importing the Libraries
 import tensorflow as tf
-from keras._tf_keras.keras.preprocessing.image import ImageDataGenerator
+
+import os
+from keras.models import Sequential
+from keras.layers import Convolution2D
+from keras.layers import MaxPooling2D
+from keras.layers import Flatten
+from keras.preprocessing.image import ImageDataGenerator
+from keras.layers import Dense , Dropout
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+sz = 128
+
 
 # Check TensorFlow version
 print(tf.__version__)
@@ -19,17 +28,19 @@ train_datagen = ImageDataGenerator(rescale=1./255,
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 # Creating the Training set
-training_set = train_datagen.flow_from_directory('data2/train',
+training_set = train_datagen.flow_from_directory('data3/data2/train',
                                                  target_size=(128, 128),
                                                  batch_size=32,
                                                  class_mode='categorical',
+                                                  color_mode='grayscale',
                                                  classes=classes_to_include)
 
 # Creating the Test set
-test_set = test_datagen.flow_from_directory('data2/test',
+test_set = test_datagen.flow_from_directory('data3/data2/test',
                                             target_size=(128, 128),
                                             batch_size=32,
                                             class_mode='categorical',
+                                            color_mode='grayscale',
                                             classes=classes_to_include)
 
 # Part 2 - Building the CNN
@@ -38,7 +49,7 @@ test_set = test_datagen.flow_from_directory('data2/test',
 classifier = tf.keras.models.Sequential()
 
 # Step 1 - Convolution
-classifier.add(tf.keras.layers.Conv2D(32, (3, 3), input_shape=(128, 128, 3), activation='relu'))
+classifier.add(tf.keras.layers.Conv2D(32, (3, 3), input_shape=(128, 128, 1), activation='relu'))
 
 # Step 2 - Pooling
 classifier.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
@@ -62,6 +73,8 @@ classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['
 # Training the model
 classifier.fit(training_set,
                epochs=5,
+               steps_per_epoch=2802//32,
+               validation_steps=930//32,
                validation_data=test_set)
 
 # Part 4 - Saving the Model
