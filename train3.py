@@ -19,7 +19,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 classes_to_include = ["S", "M", "N"]
 # Prepare the training dataset
 training_set = train_datagen.flow_from_directory(
-    'C:/Sign-Language-To-Text-Conversion/dataSet/trainingData',
+    'dataSet/trainingData',
     target_size=(128, 128),
     batch_size=10,
     color_mode='grayscale',
@@ -29,7 +29,7 @@ training_set = train_datagen.flow_from_directory(
 
 # Prepare the testing dataset
 test_set = test_datagen.flow_from_directory(
-    'C:/Sign-Language-To-Text-Conversion/dataSet/testingData',
+    'dataSet/testingData',
     target_size=(128, 128),
     batch_size=10,
     color_mode='grayscale',

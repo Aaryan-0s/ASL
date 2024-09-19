@@ -19,7 +19,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 # Prepare the training dataset
 training_set = train_datagen.flow_from_directory(
-    'C:/Sign-Language-To-Text-Conversion/dataSet/trainingData',
+    'dataSet/trainingData',
     target_size=(128, 128),
     batch_size=10,
     color_mode='grayscale',
@@ -28,7 +28,7 @@ training_set = train_datagen.flow_from_directory(
 
 # Prepare the testing dataset
 test_set = test_datagen.flow_from_directory(
-    'C:/Sign-Language-To-Text-Conversion/dataSet/testingData',
+    'dataSet/testingData',
     target_size=(128, 128),
     batch_size=10,
     color_mode='grayscale',
@@ -52,7 +52,6 @@ classifier.add(Dropout(0.40))
 
 classifier.add(Dense(units=96, activation='relu'))
 classifier.add(Dropout(0.40))
-
 classifier.add(Dense(units=64, activation='relu'))
 
 # Output layer with 27 units for classification (softmax for multi-class classification)
