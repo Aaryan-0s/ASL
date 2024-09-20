@@ -84,7 +84,7 @@ class SignLanguageProcessor(VideoProcessorBase):
         # Handling symbol counts
         self.ct[self.current_symbol] += 1
 
-        if self.ct[self.current_symbol] > 30:
+        if self.ct[self.current_symbol] > 15:
             for char in ascii_uppercase:
                 self.ct[char] = 0  # Reset all character counts
             self.ct['blank'] = 0
