@@ -24,98 +24,99 @@ os.environ["THEANO_FLAGS"] = "device=cuda, assert_no_cpu_op=True"
 class Application:
 
     def __init__(self):
-
         self.hs = Hunspell('en_US')
         self.vs = cv2.VideoCapture(0)
         self.current_image = None
         self.current_image2 = None
-        self.json_file = open("Models1\model_new.json", "r")
-        self.last_symbol_time = time.time()  # Time when the current symbol was first detected
-        self.confirmed_symbol_time = time.time()  # Time when the current symbol was confirmed
+        self.json_file = open("Models\model_new.json", "r")
+        self.last_symbol_time = time.time()
+        self.confirmed_symbol_time = time.time()
         self.selection_time_threshold = 5
         self.model_json = self.json_file.read()
         self.json_file.close()
 
         self.loaded_model = model_from_json(self.model_json)
-        self.loaded_model.load_weights("Models1\model_new.h5")
+        self.loaded_model.load_weights("Models\model_new.h5")
 
-        self.json_file_dru = open("Models1\model-bw_dru.json" , "r")
+        self.json_file_dru = open("Models\model-bw_dru.json", "r")
         self.model_json_dru = self.json_file_dru.read()
         self.json_file_dru.close()
 
         self.loaded_model_dru = model_from_json(self.model_json_dru)
-        self.loaded_model_dru.load_weights("Models1\model-bw_dru.h5")
-        self.json_file_tkdi = open("Models1\model-bw_tkdi.json" , "r")
+        self.loaded_model_dru.load_weights("Models\model-bw_dru.h5")
+
+        self.json_file_tkdi = open("Models\model-bw_tkdi.json", "r")
         self.model_json_tkdi = self.json_file_tkdi.read()
         self.json_file_tkdi.close()
 
         self.loaded_model_tkdi = model_from_json(self.model_json_tkdi)
-        self.loaded_model_tkdi.load_weights("Models1\model-bw_tkdi.h5")
-        self.json_file_smn = open("Models1\model-bw_smn.json" , "r")
+        self.loaded_model_tkdi.load_weights("Models\model-bw_tkdi.h5")
+
+        self.json_file_smn = open("Models\model-bw_smn.json", "r")
         self.model_json_smn = self.json_file_smn.read()
         self.json_file_smn.close()
 
         self.loaded_model_smn = model_from_json(self.model_json_smn)
-        self.loaded_model_smn.load_weights("Models1\model-bw_smn.h5")
+        self.loaded_model_smn.load_weights("Models\model-bw_smn.h5")
 
         self.ct = {}
         self.ct['blank'] = 0
         self.blank_flag = 0
 
         for i in ascii_uppercase:
-          self.ct[i] = 0
+            self.ct[i] = 0
         
         print("Loaded model from disk")
 
         self.root = tk.Tk()
         self.root.title("Sign Language To Text Conversion")
         self.root.protocol('WM_DELETE_WINDOW', self.destructor)
-        self.root.geometry("900x900")
+        self.root.geometry("1366x768")  # Adjusted for 1366x768 resolution
 
         self.panel = tk.Label(self.root)
-        self.panel.place(x = 100, y = 10, width = 580, height = 580)
-        
-        self.panel2 = tk.Label(self.root) # initialize image panel
-        self.panel2.place(x = 400, y = 65, width = 275, height = 275)
+        self.panel.place(x=50, y=10, width=480, height=360)  # Adjusted dimensions
+
+        self.panel2 = tk.Label(self.root)  # initialize image panel
+        self.panel2.place(x=600, y=10, width=320, height=320)  # Adjusted dimensions
 
         self.T = tk.Label(self.root)
-        self.T.place(x = 60, y = 5)
-        self.T.config(text = "Sign Language To Text Conversion", font = ("Courier", 30, "bold"))
+        self.T.place(x=200, y=370)
+        self.T.config(text="Sign Language To Text Conversion", font=("Courier", 20, "bold"))  # Adjusted font
 
-        self.panel3 = tk.Label(self.root) # Current Symbol
-        self.panel3.place(x = 500, y = 540)
+        self.panel3 = tk.Label(self.root)  # Current Symbol
+        self.panel3.place(x=250, y=400)
 
         self.T1 = tk.Label(self.root)
-        self.T1.place(x = 10, y = 540)
-        self.T1.config(text = "Character :", font = ("Courier", 30, "bold"))
+        self.T1.place(x=10, y=420)
+        self.T1.config(text="Character:", font=("Courier", 20, "bold"))  # Adjusted font
 
-        self.panel4 = tk.Label(self.root) # Word
-        self.panel4.place(x = 220, y = 595)
+        self.panel4 = tk.Label(self.root)  # Word
+        self.panel4.place(x=150, y=470)
 
         self.T2 = tk.Label(self.root)
-        self.T2.place(x = 10,y = 595)
-        self.T2.config(text = "Word :", font = ("Courier", 30, "bold"))
+        self.T2.place(x=10, y=470)
+        self.T2.config(text="Word:", font=("Courier", 20, "bold"))  # Adjusted font
 
-        self.panel5 = tk.Label(self.root) # Sentence
-        self.panel5.place(x = 350, y = 645)
+        self.panel5 = tk.Label(self.root)  # Sentence
+        self.panel5.place(x=250, y=520)
 
         self.T3 = tk.Label(self.root)
-        self.T3.place(x = 10, y = 645)
-        self.T3.config(text = "Sentence :",font = ("Courier", 30, "bold"))
+        self.T3.place(x=10, y=520)
+        self.T3.config(text="Sentence:", font=("Courier", 20, "bold"))  # Adjusted font
 
         self.T4 = tk.Label(self.root)
-        self.T4.place(x = 250, y = 690)
-        self.T4.config(text = "Suggestions :", fg = "red", font = ("Courier", 30, "bold"))
+        self.T4.place(x=200, y=570)
+        self.T4.config(text="Suggestions:", fg="red", font=("Courier", 20, "bold"))  # Adjusted font
 
-        self.bt1 = tk.Button(self.root, command = self.action1, height = 0, width = 0)
-        self.bt1.place(x = 26, y = 745)
+        # Buttons for suggestions
+        self.bt1 = tk.Button(self.root, command=self.action1, height=1, width=10)
+        self.bt1.place(x=100, y=620)
 
-        self.bt2 = tk.Button(self.root, command = self.action2, height = 0, width = 0)
-        self.bt2.place(x = 325, y = 745)
+        self.bt2 = tk.Button(self.root, command=self.action2, height=1, width=10)
+        self.bt2.place(x=300, y=620)
 
-        self.bt3 = tk.Button(self.root, command = self.action3, height = 0, width = 0)
-        self.bt3.place(x = 625, y = 745)
-
+        self.bt3 = tk.Button(self.root, command=self.action3, height=1, width=10)
+        self.bt3.place(x=500, y=620)
 
         self.str = ""
         self.word = " "
